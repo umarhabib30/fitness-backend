@@ -46,6 +46,11 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+        'trainer' => [
+            'driver' => 'session',
+            'provider' => 'trainers',
+        ],
     ],
 
     /*
@@ -69,6 +74,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+
+        'trainers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Trainer::class,
         ],
 
         // 'users' => [
@@ -95,6 +105,13 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'trainers' => [
+            'provider' => 'trainers',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,

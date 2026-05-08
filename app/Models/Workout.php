@@ -16,7 +16,7 @@ class Workout extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
     use HasSlug;
 
-    protected $fillable = [ 'title', 'slug', 'description', 'status', 'workout_type_id', 'level_id', 'is_premium', 'visibility' ];
+    protected $fillable = [ 'title', 'slug', 'description', 'status', 'workout_type_id', 'level_id', 'is_premium', 'visibility', 'trainer_id' ];
 
     protected $casts = [
         'workout_type_id'   => 'integer',

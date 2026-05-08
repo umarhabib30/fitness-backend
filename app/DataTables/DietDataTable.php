@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Helpers\TrainerHelper;
 use App\Models\Diet;
 use App\Models\CategoryDiet;
 use Yajra\DataTables\Html\Button;
@@ -90,6 +91,7 @@ class DietDataTable extends DataTable
     public function query(Diet $model)
     {
         $model = Diet::query()->with('categorydiet');
+        TrainerHelper::applyScope($model);
         return $this->applyScopes($model);
     }
 

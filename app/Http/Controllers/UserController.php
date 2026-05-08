@@ -11,9 +11,11 @@ use App\Models\Diet;
 use App\Models\Workout;
 use App\Helpers\AuthHelper;
 use App\Models\Role;
+use App\Models\Trainer;
 use App\Http\Requests\UserRequest;
 use App\DataTables\SubscriptionDataTable;
 use App\Exports\UserReportExport;
+use App\Helpers\TrainerHelper;
 use App\Models\UserGraph;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
@@ -75,6 +77,15 @@ class UserController extends Controller
         $request['password'] = bcrypt($request->password);
         $request['username'] = $request->username ?? stristr($request->email, "@", true) . rand(100, 1000);
         $request['display_name'] = $request['first_name'] . " " . $request['last_name'];
+
+        // If a trainer is creating a client, associate the client with the trainer
+        if (auth()->user()->hasRole('trainer')) {
+            $trainer = auth()->user()->trainerProfile;
+            if ($trainer) {
+                $request['trainer_id'] = $trainer->id;
+            }
+        }
+
         $user = User::create($request->all());
 
         storeMediaFile($user, $request->profile_image, 'profile_image');
@@ -103,6 +114,7 @@ class UserController extends Controller
 
         $pageTitle = __('message.view_form_title', ['form' => __('message.user')]);
         $data = User::with('userProfile', 'roles')->findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
         $profileImage = getSingleMedia($data, 'profile_image');
 
         $type = $tab ?? 'detail';
@@ -173,6 +185,7 @@ class UserController extends Controller
         }
 
         $data = User::with('userProfile')->findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
         $assets = ['phone'];
 
         $pageTitle = __('message.update_form_title', ['form' => __('message.user')]);
@@ -198,6 +211,7 @@ class UserController extends Controller
         }
 
         $user = User::with('userProfile')->findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($user);
         $request['display_name'] = $request['first_name'] . " " . $request['last_name'];
         $user->removeRole($user->user_type);
 
@@ -234,6 +248,7 @@ class UserController extends Controller
         }
 
         $user = User::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($user);
         $status = 'errors';
         $message = __('message.not_found_entry', ['name' => __('message.user')]);
 

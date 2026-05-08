@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Helpers\DateTimeHelper;
+use App\Helpers\TrainerHelper;
 use App\Models\ClassSchedule;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
@@ -85,7 +86,7 @@ class ClassScheduleDataTable extends DataTable
      */
     public function query(ClassSchedule $model)
     {
-        return $model->newQuery();
+        return TrainerHelper::applyScope($model->newQuery());
     }
 
     /**

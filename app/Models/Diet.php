@@ -15,7 +15,7 @@ class Diet extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
     use HasSlug;
 
-    protected $fillable = [ 'title', 'slug', 'categorydiet_id', 'calories', 'carbs', 'protein', 'fat', 'servings', 'total_time', 'is_featured', 'status', 'ingredients', 'description', 'is_premium', 'visibility' ];
+    protected $fillable = [ 'title', 'slug', 'categorydiet_id', 'calories', 'carbs', 'protein', 'fat', 'servings', 'total_time', 'is_featured', 'status', 'ingredients', 'description', 'is_premium', 'visibility', 'trainer_id' ];
 
     protected $casts = [
         'is_premium'        => 'integer',

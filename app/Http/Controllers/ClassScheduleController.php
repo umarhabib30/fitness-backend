@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\DataTables\ClassScheduleDataTable;
+use App\Helpers\TrainerHelper;
 use App\Models\ClassSchedule;
 use App\Helpers\AuthHelper;
 
@@ -71,7 +72,7 @@ class ClassScheduleController extends Controller
         $data['start_time'] = Carbon::parse($request->start_time)->setTimezone('UTC')->toDateTimeString();
         $data['end_time'] = Carbon::parse($request->end_time)->setTimezone('UTC')->toDateTimeString();
 
-        ClassSchedule::create($data);
+        ClassSchedule::create(TrainerHelper::setTrainerId($data));
         return redirect()->route('classschedule.index')->withSuccess(__('message.save_form', ['form' => __('message.class_schedule')]));
     }
 
@@ -100,6 +101,7 @@ class ClassScheduleController extends Controller
         }
 
         $data = ClassSchedule::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
         $workout_id = $data->workout_type == 'other' ? ['other' => __('message.other')] : [ $data->workout_id => optional($data->workout)->title ];
 
         $pageTitle = __('message.update_form_title',[ 'form' => __('message.class_schedule') ]);
@@ -121,6 +123,7 @@ class ClassScheduleController extends Controller
         }
 
         $class_schedule = ClassSchedule::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($class_schedule);
 
         $data = $request->all();
         $data['workout_title'] = $request->workout_id == 'other' ? $request->workout_title : null;
@@ -129,7 +132,7 @@ class ClassScheduleController extends Controller
         $data['price'] = $request->is_paid == 1 ? $request->price : null;
 
         // ClassSchedule data...
-        $class_schedule->fill($data)->update();
+        $class_schedule->fill(TrainerHelper::setTrainerId($data))->update();
 
         if(auth()->check()){
             return redirect()->route('classschedule.index')->withSuccess(__('message.update_form',['form' => __('message.class_schedule')]));
@@ -152,6 +155,7 @@ class ClassScheduleController extends Controller
         }
 
         $class_schedule = ClassSchedule::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($class_schedule);
         $status = 'errors';
         $message = __('message.not_found_entry', ['name' => __('message.class_schedule')]);
 

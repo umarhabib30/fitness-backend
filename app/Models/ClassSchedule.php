@@ -9,7 +9,7 @@ class ClassSchedule extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 'class_name', 'workout_id', 'workout_title', 'workout_type', 'start_date', 'end_date', 'start_time', 'end_time', 'name', 'link', 'is_paid', 'price'];
+    protected $fillable = [ 'class_name', 'workout_id', 'workout_title', 'workout_type', 'start_date', 'end_date', 'start_time', 'end_time', 'name', 'link', 'is_paid', 'price', 'trainer_id'];
 
     protected $casts = [
         'workout_id'   => 'integer',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\DataTables\DietDataTable;
 use App\Helpers\AuthHelper;
+use App\Helpers\TrainerHelper;
 use App\Models\Diet;
 
 use App\Http\Requests\DietRequest;
@@ -61,7 +62,7 @@ class DietController extends Controller
             return redirect()->back()->withErrors($message);
         }
 
-        $diet = Diet::create($request->all());
+        $diet = Diet::create(TrainerHelper::setTrainerId($request->all()));
 
         storeMediaFile($diet,$request->diet_image, 'diet_image'); 
 
@@ -77,6 +78,7 @@ class DietController extends Controller
     public function show($id)
     {
         $data = Diet::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
     }
 
     /**
@@ -113,9 +115,10 @@ class DietController extends Controller
         }
 
         $diet = Diet::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($diet);
 
         // diet data...
-        $diet->fill($request->all())->update();
+        $diet->fill(TrainerHelper::setTrainerId($request->all()))->update();
 
         // Save diet image...
         if (isset($request->diet_image) && $request->diet_image != null) {
@@ -144,6 +147,7 @@ class DietController extends Controller
         }
 
         $diet = Diet::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($diet);
         $status = 'errors';
         $message = __('message.not_found_entry', ['name' => __('message.diet')]);
 

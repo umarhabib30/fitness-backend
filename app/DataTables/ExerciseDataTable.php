@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Helpers\TrainerHelper;
 use App\Models\Exercise;
 use App\Models\Equipment;
 use App\Models\Level;
@@ -92,6 +93,7 @@ class ExerciseDataTable extends DataTable
     public function query(Exercise $model)
     {
         $model = Exercise::query()->with('equipment','level');
+        TrainerHelper::applyScope($model);
         return $this->applyScopes($model);
     }
 

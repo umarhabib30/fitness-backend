@@ -15,7 +15,7 @@ class Exercise extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
     use HasSlug;
 
-    protected $fillable = [ 'title', 'slug', 'instruction', 'tips', 'video_type', 'video_url', 'bodypart_ids', 'duration', 'sets', 'equipment_id', 'level_id', 'status','is_premium', 'based', 'type', 'seconds_per_rep' ];
+    protected $fillable = [ 'title', 'slug', 'instruction', 'tips', 'video_type', 'video_url', 'bodypart_ids', 'duration', 'sets', 'equipment_id', 'level_id', 'status','is_premium', 'based', 'type', 'seconds_per_rep', 'trainer_id' ];
 
     protected $casts = [
         'equipment_id'      => 'integer',

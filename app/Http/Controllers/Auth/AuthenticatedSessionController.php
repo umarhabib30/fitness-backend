@@ -8,6 +8,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Role;
+use Illuminate\Validation\ValidationException;
 
 use App\Traits\LoginHistoryTrait;
 
@@ -36,6 +37,20 @@ class AuthenticatedSessionController extends Controller
  
         $request->session()->regenerate();
         $auth_user = auth()->user();
+
+        if ($auth_user->hasRole('trainer')) {
+            $trainer = $auth_user->trainerProfile;
+
+            if (!$trainer || $trainer->status !== 'active') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                throw ValidationException::withMessages([
+                    'email' => __('message.trainer_inactive_account'),
+                ]);
+            }
+        }
 
         if( !$auth_user->hasRole('user') ) {
             $this->saveLoginHistory($auth_user);

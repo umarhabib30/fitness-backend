@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\DataTables\EquipmentDataTable;
 use App\Models\Equipment;
 use App\Helpers\AuthHelper;
+use App\Helpers\TrainerHelper;
 
 use App\Http\Requests\EquipmentRequest;
 
@@ -61,7 +62,7 @@ class EquipmentController extends Controller
             return redirect()->back()->withErrors($message);
         }
 
-        $equipment = Equipment::create($request->all());
+        $equipment = Equipment::create(TrainerHelper::setTrainerId($request->all()));
 
         storeMediaFile($equipment,$request->equipment_image, 'equipment_image'); 
 
@@ -77,6 +78,7 @@ class EquipmentController extends Controller
     public function show($id)
     {
         $data = Equipment::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
     }
 
     /**
@@ -113,9 +115,10 @@ class EquipmentController extends Controller
         }
 
         $equipment = Equipment::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($equipment);
 
         // Equipment data...
-        $equipment->fill($request->all())->update();
+        $equipment->fill(TrainerHelper::setTrainerId($request->all()))->update();
 
         // Save equipment image...
         if (isset($request->equipment_image) && $request->equipment_image != null) {
@@ -144,6 +147,7 @@ class EquipmentController extends Controller
         }
 
         $equipment = Equipment::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($equipment);
         $status = 'errors';
         $message = __('message.not_found_entry', ['name' => __('message.equipment')]);
 

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\DataTables\PackageDataTable;
 use App\Models\Package;
 use App\Helpers\AuthHelper;
+use App\Helpers\TrainerHelper;
 
 use App\Http\Requests\PackageRequest;
 
@@ -61,7 +62,7 @@ class PackageController extends Controller
             return redirect()->back()->withErrors($message);
         }
 
-        $package = Package::create($request->all());
+        $package = Package::create(TrainerHelper::setTrainerId($request->all()));
 
         storeMediaFile($package,$request->package_image, 'package_image'); 
 
@@ -77,6 +78,7 @@ class PackageController extends Controller
     public function show($id)
     {
         $data = Package::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
     }
 
     /**
@@ -113,9 +115,10 @@ class PackageController extends Controller
         }
 
         $package = Package::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($package);
 
         // package data...
-        $package->fill($request->all())->update();
+        $package->fill(TrainerHelper::setTrainerId($request->all()))->update();
 
         // Save package image...
         if (isset($request->package_image) && $request->package_image != null) {
@@ -144,6 +147,7 @@ class PackageController extends Controller
         }
 
         $package = Package::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($package);
         $status = 'errors';
         $message = __('message.not_found_entry', ['name' => __('message.package')]);
 

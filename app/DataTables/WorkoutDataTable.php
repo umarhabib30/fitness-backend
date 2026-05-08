@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Helpers\TrainerHelper;
 use App\Models\Workout;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
@@ -99,7 +100,7 @@ class WorkoutDataTable extends DataTable
      */
     public function query(Workout $model)
     {
-        return $model->newQuery();
+        return TrainerHelper::applyScope($model->newQuery());
     }
 
 

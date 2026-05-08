@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Helpers\TrainerHelper;
 use App\Models\User;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
@@ -78,7 +79,10 @@ class UsersDataTable extends DataTable
      */
     public function query()
     {
-        $model = User::where('user_type', 'user')->with('userProfile');
+        $model = User::where('user_type', 'user')
+            ->with('userProfile')
+            ->when(TrainerHelper::isTrainer(), fn ($q) => $q->where('trainer_id', TrainerHelper::trainerId()));
+
         return $this->applyScopes($model);
     }
 

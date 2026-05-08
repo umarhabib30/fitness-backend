@@ -22,6 +22,7 @@ use App\Models\Product;
 use App\Models\Package;
 use App\Models\ProductCategory;
 use App\Helpers\AuthHelper;
+use App\Helpers\TrainerHelper;
 use App\Models\AppSetting;
 use App\Models\BannerSlider;
 use App\Models\DefaultKeyword;
@@ -76,12 +77,15 @@ class HomeController extends Controller
                 return response()->json($data);
             }
 
-            $subscription_amount = Subscription::where('payment_status', 'paid')->sum('total_amount');
-            $data['total_subscription'] = Subscription::where('payment_status', 'paid')->count();
+            $subscriptionQuery = Subscription::where('payment_status', 'paid');
+            TrainerHelper::applyScope($subscriptionQuery);
+
+            $subscription_amount = (clone $subscriptionQuery)->sum('total_amount');
+            $data['total_subscription'] = (clone $subscriptionQuery)->count();
             $data['total_subscription_amount'] = humanReadableNumber($subscription_amount, 2, true);
             $data['subscription_amount'] = getPriceFormat($subscription_amount);
-            $data['recent_subscription'] = Subscription::active()->orderBy('id', 'desc')->take(10)->get();
-            $data['expire_soon_subscription'] = Subscription::active()->orderBy('subscription_end_date', 'asc')->take(10)->get();
+            $data['recent_subscription'] = TrainerHelper::applyScope(Subscription::active())->orderBy('id', 'desc')->take(10)->get();
+            $data['expire_soon_subscription'] = TrainerHelper::applyScope(Subscription::active())->orderBy('subscription_end_date', 'asc')->take(10)->get();
 
             $data['line_chart'] = $this->getSubscriptionChartData('week', 'line', $data['currency_symbol'], $data['currency_position']);
             $data['pie_chart']  = $this->getSubscriptionChartData('week', 'pie', $data['currency_symbol'], $data['currency_position']);
@@ -90,20 +94,20 @@ class HomeController extends Controller
         }
 
         $data['dashboard'] = [
-            'total_user'        => User::role('user')->count(),
-            'total_equipment'   => Equipment::count(),
+            'total_user'        => TrainerHelper::applyScope(User::role('user'))->count(),
+            'total_equipment'   => TrainerHelper::applyScope(Equipment::query())->count(),
             'total_level'       => Level::count(),
-            'total_bodypart'    => BodyPart::count(),
+            'total_bodypart'    => TrainerHelper::applyScope(BodyPart::query())->count(),
             'total_workouttype' => WorkoutType::count(),
-            'total_exercise'    => Exercise::count(),
-            'total_workout'     => Workout::count(),
-            'total_diet'        => Diet::count(),
+            'total_exercise'    => TrainerHelper::applyScope(Exercise::query())->count(),
+            'total_workout'     => TrainerHelper::applyScope(Workout::query())->count(),
+            'total_diet'        => TrainerHelper::applyScope(Diet::query())->count(),
             'total_post'        => Post::count(),
         ];               
 
-        $data['exercise'] = Exercise::orderBy('id', 'desc')->take(10)->get();
-        $data['workout'] = Workout::orderBy('id', 'desc')->take(10)->get();
-        $data['diet'] = Diet::orderBy('id', 'desc')->take(10)->get();
+        $data['exercise'] = TrainerHelper::applyScope(Exercise::query())->orderBy('id', 'desc')->take(10)->get();
+        $data['workout'] = TrainerHelper::applyScope(Workout::query())->orderBy('id', 'desc')->take(10)->get();
+        $data['diet'] = TrainerHelper::applyScope(Diet::query())->orderBy('id', 'desc')->take(10)->get();
         $data['post'] = Post::orderBy('id', 'desc')->take(10)->get();
 
         return view('dashboards.dashboard', compact('assets', 'data', 'auth_user'));
@@ -112,7 +116,7 @@ class HomeController extends Controller
     private function getSubscriptionChartData($filter, $type, $currency_symbol, $currency_position)
     {
         $now = now();
-        $query = Subscription::query();
+        $query = TrainerHelper::applyScope(Subscription::query());
 
         switch ($filter) {
             case 'week':
@@ -412,6 +416,7 @@ class HomeController extends Controller
                 break;
         case 'equipment':
             $items = Equipment::select('id','title as text')->where('status','active');
+                TrainerHelper::applyScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -434,6 +439,7 @@ class HomeController extends Controller
                 break;
         case 'bodypart':
             $items = BodyPart::select('id','title as text')->where('status','active');
+                TrainerHelper::applyScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -441,6 +447,7 @@ class HomeController extends Controller
                 break;
         case 'exercise':
             $items = Exercise::select('id','title as text')->where('status','active');
+                TrainerHelper::applyScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -462,6 +469,7 @@ class HomeController extends Controller
                 break;
         case 'diet':
             $items = Diet::select('id','title as text')->where('status','active');
+                TrainerHelper::applyScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -474,7 +482,10 @@ class HomeController extends Controller
                 $items = $items->get();
             break;
             case 'user':
-                    $items = User::select('id','id as text')->where('status','active');
+                    $items = User::select('id','id as text')->where('status','active')->where('user_type', 'user');
+                    if (TrainerHelper::isTrainer()) {
+                        $items->where('trainer_id', TrainerHelper::trainerId());
+                    }
                     if($value != ''){
                         $items->where('id', 'LIKE', '%'.$value.'%');
                     }
@@ -489,6 +500,7 @@ class HomeController extends Controller
                 break;
         case 'workout':
                 $items = Workout::select('id','title as text');
+                TrainerHelper::applyScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -548,6 +560,7 @@ class HomeController extends Controller
                         break;
         case 'package':
             $items = Package::select('id','name as text')->where('status','active');
+                TrainerHelper::applyScope($items);
                 if($value != ''){
                     $items->where('name', 'LIKE', '%'.$value.'%');
                 }

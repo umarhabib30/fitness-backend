@@ -2,7 +2,6 @@
     $url = '';
 
     $MyNavBar = \Menu::make('MenuList', function ($menu) use($url){
-
         //Admin Dashboard
         $menu->add('<span class="item-name">'.__('message.dashboard').'</span>', ['route' => 'dashboard'])
             ->prepend('<i class="icon">
@@ -36,6 +35,23 @@
                 ->data('permission', [ 'user-add', 'user-edit'])
                 ->prepend('<i class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor"><g><circle cx="12" cy="12" r="8" fill="currentColor"></circle></g></svg></i>')
                 ->link->attr(['class' => request()->routeIs('users.create') || request()->routeIs('users.edit') ? 'nav-link active' : 'nav-link']);
+
+        // Trainer parent menu
+        $menu->add('<span class="item-name">Trainer</span>', ['class' => ''])
+            ->nickname('trainer')
+            ->prepend('<i class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" stroke="currentColor" stroke-width="1.5"/><path d="M6 20v-2c0-2.21 1.79-4 4-4h4c2.21 0 4 1.79 4 4v2" stroke="currentColor" stroke-width="1.5"/></svg></i>')
+            ->link->attr(['class' => 'nav-link' ])
+            ->href('#trainer');
+        // Trainer list link
+        $menu->trainer->add('<span class="item-name">'.__('message.list_form_title',["form" => __('message.trainer')]).'</span>', ['route' => 'trainers.index'])
+            ->data('permission', 'trainer-list')
+            ->prepend('<i class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/></svg></i>')
+            ->link->attr(['class' => activeRoute(route('trainers.index')) ? 'nav-link active' : 'nav-link']);
+        // Trainer create link
+        $menu->trainer->add('<span class="item-name">'.__('message.add_form_title',["form" => __('message.trainer')]).'</span>', ['route' => 'trainers.create'])
+            ->data('permission', ['trainer-add','trainer-edit'])
+            ->prepend('<i class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></i>')
+            ->link->attr(['class' => request()->routeIs('trainers.create') || request()->routeIs('trainers.edit') ? 'nav-link active' : 'nav-link']);
 
         $menu->add('<span class="item-name">'.__('message.sub_admin').'</span>', ['class' => ''])
             ->prepend('<i class="icon">
@@ -736,4 +752,3 @@
     });
 </script>
 @endpush
-

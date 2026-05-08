@@ -29,6 +29,12 @@ class RoleTableSeeder extends Seeder
                 'title' => 'User',
                 'status' => 1,
                 'permissions' => []
+            ],
+            [
+                'name' => 'trainer',
+                'title' => 'Trainer',
+                'status' => 1,
+                'permissions' => \App\Support\TrainerPermissions::PERMISSIONS,
             ]
         ];
 

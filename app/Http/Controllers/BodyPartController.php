@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\DataTables\BodyPartDataTable;
 use App\Helpers\AuthHelper;
+use App\Helpers\TrainerHelper;
 use App\Models\BodyPart;
 
 use App\Http\Requests\BodyPartRequest;
@@ -60,7 +61,7 @@ class BodyPartController extends Controller
             return redirect()->back()->withErrors($message);
         }
 
-        $bodypart = BodyPart::create($request->all());
+        $bodypart = BodyPart::create(TrainerHelper::setTrainerId($request->all()));
 
         storeMediaFile($bodypart,$request->bodypart_image, 'bodypart_image'); 
 
@@ -76,6 +77,7 @@ class BodyPartController extends Controller
     public function show($id)
     {
         $data = BodyPart::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
     }
 
     /**
@@ -112,9 +114,10 @@ class BodyPartController extends Controller
         }
 
         $bodypart = BodyPart::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($bodypart);
 
         // bodypart data...
-        $bodypart->fill($request->all())->update();
+        $bodypart->fill(TrainerHelper::setTrainerId($request->all()))->update();
 
         // Save bodypart image...
         if (isset($request->bodypart_image) && $request->bodypart_image != null) {
@@ -143,6 +146,7 @@ class BodyPartController extends Controller
         }
 
         $bodypart = BodyPart::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($bodypart);
         $status = 'errors';
         $message = __('message.not_found_entry', ['name' => __('message.bodypart')]);
 

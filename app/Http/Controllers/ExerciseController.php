@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\DataTables\ExerciseDataTable;
+use App\Helpers\TrainerHelper;
 use App\Models\Exercise;
 use App\Helpers\AuthHelper;
 use App\Models\BodyPart;
@@ -93,7 +94,7 @@ class ExerciseController extends Controller
         unset($data['minute']);
         unset($data['second']);
 
-        $exercise = Exercise::create($data);
+        $exercise = Exercise::create(TrainerHelper::setTrainerId($data));
     
         storeMediaFile($exercise,$request->exercise_image, 'exercise_image');
         if( $exercise->video_type == 'upload_video' ) {
@@ -128,6 +129,7 @@ class ExerciseController extends Controller
         }
 
         $data = Exercise::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
         $pageTitle = __('message.update_form_title',[ 'form' => __('message.exercise') ]);
 
         $selected_bodypart = [];
@@ -156,6 +158,7 @@ class ExerciseController extends Controller
         $data = $request->all();
         
         $exercise = Exercise::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($exercise);
         // Exercise data...
         if(request('equipment_id') == null) {
             $data['equipment_id'] = null;
@@ -189,7 +192,7 @@ class ExerciseController extends Controller
         unset($data['minute']);
         unset($data['second']);
 
-        $exercise->fill($data)->update();           
+        $exercise->fill(TrainerHelper::setTrainerId($data))->update();           
 
         // Save exercise image...
         if (isset($request->exercise_image) && $request->exercise_image != null) {
@@ -225,6 +228,7 @@ class ExerciseController extends Controller
         }
 
         $exercise = Exercise::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($exercise);
         $status = 'errors';
         $message = __('message.not_found_entry', ['name' => __('message.exercise')]);
 

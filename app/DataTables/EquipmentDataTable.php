@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Helpers\TrainerHelper;
 use App\Models\Equipment;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
@@ -72,7 +73,7 @@ class EquipmentDataTable extends DataTable
      */
     public function query(Equipment $model)
     {
-        return $model->newQuery();
+        return TrainerHelper::applyScope($model->newQuery());
     }
 
     /**

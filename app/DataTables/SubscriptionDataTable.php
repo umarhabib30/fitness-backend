@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Helpers\TrainerHelper;
 use App\Models\Subscription;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
@@ -71,6 +72,7 @@ class SubscriptionDataTable extends DataTable
     public function query(Subscription $model)
     {
         $model = Subscription::query()->with('user','package');
+        TrainerHelper::applyScope($model);
 
         if( $this->user_id != null ) {
             $model = $model->where('user_id', $this->user_id);

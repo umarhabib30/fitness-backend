@@ -9,7 +9,7 @@ class Package extends Model
 {
     use HasFactory;
 
-    protected $fillable=[ 'name', 'duration_unit', 'duration', 'price', 'description', 'status' ];
+    protected $fillable=[ 'name', 'duration_unit', 'duration', 'price', 'description', 'status', 'trainer_id' ];
     
     protected $casts = [
         'duration'      => 'integer',

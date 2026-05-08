@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\DataTables\SubscriptionDataTable;
+use App\Helpers\TrainerHelper;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Models\Package;
@@ -28,7 +29,9 @@ class SubscriptionController extends Controller
             return redirect()->back()->withErrors($message);
         }
         $assets = ['data-table'];
-        $users = User::where('user_type', 'user')->pluck('display_name', 'id');
+        $users = User::where('user_type', 'user')
+            ->when(TrainerHelper::isTrainer(), fn ($q) => $q->where('trainer_id', TrainerHelper::trainerId()))
+            ->pluck('display_name', 'id');
         
         $user_id = request('user_id', []);
 
@@ -37,7 +40,9 @@ class SubscriptionController extends Controller
             'user_id'   => $user_id,
         ];
         
-        $selected_users = User::whereIn('id', (array)$user_id)->pluck('display_name', 'id');
+        $selected_users = User::whereIn('id', (array)$user_id)
+            ->when(TrainerHelper::isTrainer(), fn ($q) => $q->where('trainer_id', TrainerHelper::trainerId()))
+            ->pluck('display_name', 'id');
         $filter['selected_users'] = $selected_users;
 
         $headerAction = $auth_user->can('subscription-add') ? '<a href="#" class="float-end btn btn-sm btn-primary" data-modal-form="form" data-size="small" data--href="'.route('subscription.create').'" data-app-title="'.__('message.add_button_form',['form' => '']).'" data-placement="top">'.__('message.add_button_form',['form' => '']).'</a>' : '';
@@ -60,7 +65,11 @@ class SubscriptionController extends Controller
 
         $pageTitle = __('message.add_form_title',[ 'form' => __('message.subscription')]);
         
-        $users = User::where('status','active')->where('user_type','user')->where('is_subscribe',0)->pluck('display_name','id');
+        $users = User::where('status','active')
+            ->where('user_type','user')
+            ->where('is_subscribe',0)
+            ->when(TrainerHelper::isTrainer(), fn ($q) => $q->where('trainer_id', TrainerHelper::trainerId()))
+            ->pluck('display_name','id');
       
         $view = view('subscription.form', compact('pageTitle','users'))->render();
         return response()->json([ 'data' => $view, 'status' => true ]);
@@ -97,6 +106,7 @@ class SubscriptionController extends Controller
             ];
             $data['subscription_end_date'] = $this->get_plan_expiration_date( $data['subscription_start_date'], $package_data->duration_unit, $active_plan_left_days, $package_data->duration );
             $data['package_data'] = $package_data ?? null;
+            $data['trainer_id'] = TrainerHelper::isTrainer() ? TrainerHelper::trainerId() : $user->trainer_id;
     
             $subscription = Subscription::create($data);
 

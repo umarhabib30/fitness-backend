@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\DataTables\WorkoutDataTable;
 use App\Helpers\AuthHelper;
+use App\Helpers\TrainerHelper;
 use App\Models\Workout;
 use App\Models\WorkoutDayExercise;
 use App\Models\WorkoutDay;
@@ -61,7 +62,7 @@ class WorkoutController extends Controller
             return redirect()->back()->withErrors($message);
         }
 
-        $workout = Workout::create($request->all());
+        $workout = Workout::create(TrainerHelper::setTrainerId($request->all()));
 
         storeMediaFile($workout,$request->workout_image, 'workout_image'); 
 
@@ -125,6 +126,7 @@ class WorkoutController extends Controller
             return redirect()->back()->withErrors($message);
         }
         $data = Workout::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
         $pageTitle = __('message.update_form_title',[ 'form' => __('message.workout') ]);
         if(isset($id) && count($data->workoutDay) > 0){
             foreach($data->workoutDay as &$field){
@@ -158,8 +160,9 @@ class WorkoutController extends Controller
         }
 
         $workout = Workout::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($workout);
         // workout data...
-        $workout->fill($request->all())->update();
+        $workout->fill(TrainerHelper::setTrainerId($request->all()))->update();
 
         // Save workout image...
         if (isset($request->workout_image) && $request->workout_image != null) {
@@ -221,6 +224,7 @@ class WorkoutController extends Controller
         }
 
         $workout = Workout::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($workout);
         $status = 'errors';
         $message = __('message.not_found_entry', ['name' => __('message.workout')]);
 

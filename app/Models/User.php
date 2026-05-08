@@ -22,7 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
      *
      * @var array
      */
-    protected $fillable = [ 'username', 'first_name', 'last_name', 'phone_number', 'status', 'email', 'password', 'gender', 'display_name', 'login_type', 'user_type', 'player_id', 'is_subscribe', 'timezone','last_notification_seen', 'apple_user_identifier' ];
+    protected $fillable = [ 'username', 'first_name', 'last_name', 'phone_number', 'status', 'email', 'password', 'gender', 'display_name', 'login_type', 'user_type', 'player_id', 'is_subscribe', 'timezone','last_notification_seen', 'apple_user_identifier', 'trainer_id' ];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -166,6 +166,17 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
 
     public function reportPosting() {
         return $this->hasMany(ReportPosting::class, 'user_id', 'id');
+    }
+
+    // Trainer relationship (owner of this client)
+    public function trainer()
+    {
+        return $this->belongsTo(Trainer::class, 'trainer_id');
+    }
+
+    public function trainerProfile()
+    {
+        return $this->hasOne(Trainer::class, 'user_id');
     }
 
     public function scopeUserReport($query)

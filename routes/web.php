@@ -115,6 +115,10 @@ Route::group(['middleware' => [ 'auth', 'useractive' ]], function () {
 
     // Users Module
     Route::resource('users', UserController::class);
+    // Trainers Module
+    Route::resource('trainers', \App\Http\Controllers\Admin\TrainerController::class);
+    Route::post('trainers/{trainer}/toggle-status', [\App\Http\Controllers\Admin\TrainerController::class, 'toggleStatus'])->name('trainers.toggle-status');
+    Route::resource('trainer-packages', \App\Http\Controllers\Admin\TrainerPackageController::class)->except('show');
     Route::get('download-user-report/{fileType?}', [UserController::class, 'downloadUserReport'])->where('fileType', 'xlsx|xls|csv|ods|html')->name('download.user.report');
     Route::get('download-user-report-pdf', [UserController::class, 'downloadUserReportPdf'])->name('download.user.report.pdf');
     Route::get('users/{id}/{tab?}/', [UserController::class, 'show'])->name('users.show');
