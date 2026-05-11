@@ -37,7 +37,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h4 class="card-title mb-0">{{ __('message.subscription') }}</h4>
-                    <a href="{{ route('trainer.packages.index') }}" class="btn btn-sm btn-primary">{{ __('message.see_all') }}</a>
+                    <a href="{{ route('trainer.settings.index') }}" class="btn btn-sm btn-primary">{{ __('message.setting') }}</a>
                 </div>
                 <div class="card-body">
                     @if($activeSubscription)
@@ -60,13 +60,10 @@
                     @foreach($packages->take(3) as $package)
                         <div class="border rounded p-3 mb-3">
                             <h6 class="mb-1">{{ $package->name }}</h6>
-                            <div class="text-muted small mb-2">{{ number_format($package->price, 2) }}</div>
-                            <form method="POST" action="{{ route('trainer.packages.subscribe', $package) }}">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-primary">{{ __('message.subscription') }}</button>
-                            </form>
+                            <div class="text-muted small mb-2">{{ number_format((float) $package->price, 2) }}</div>
                         </div>
                     @endforeach
+                    <a href="{{ route('trainer.settings.index') }}" class="btn btn-sm btn-primary">{{ __('message.setting') }}</a>
                 </div>
             </div>
         </div>

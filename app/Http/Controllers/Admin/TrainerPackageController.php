@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DataTables\TrainerPackageDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\TrainerPackage;
 use Illuminate\Http\Request;
 
 class TrainerPackageController extends Controller
@@ -12,10 +14,13 @@ class TrainerPackageController extends Controller
         $this->middleware(['auth', 'role:admin']);
     }
 
-    public function index()
+    public function index(TrainerPackageDataTable $dataTable)
     {
-        $packages = \App\Models\TrainerPackage::paginate(20);
-        return view('admin.trainer_packages.index', compact('packages'));
+        $pageTitle = 'Trainer Packages';
+        $assets = ['data-table'];
+        $headerAction = '<a href="' . route('trainer-packages.create') . '" class="btn btn-sm btn-primary" role="button">Add Trainer Package</a>';
+
+        return $dataTable->render('global.datatable', compact('pageTitle', 'assets', 'headerAction'));
     }
 
     public function create()
@@ -25,45 +30,53 @@ class TrainerPackageController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'interval'    => 'required|in:monthly,yearly',
-            'duration_days'=> 'required|integer|min:1',
-            'features'    => 'nullable|array',
-            'is_active'   => 'required|boolean',
-        ]);
-        \App\Models\TrainerPackage::create($data);
+        $data = $this->validatedData($request);
+        TrainerPackage::create($data);
+
         return redirect()->route('trainer-packages.index')
-                         ->withSuccess(__('Package created successfully'));
+                         ->withSuccess('Trainer package created successfully');
     }
 
-    public function edit(\App\Models\TrainerPackage $trainerPackage)
+    public function edit(TrainerPackage $trainerPackage)
     {
         return view('admin.trainer_packages.edit', compact('trainerPackage'));
     }
 
-    public function update(Request $request, \App\Models\TrainerPackage $trainerPackage)
+    public function update(Request $request, TrainerPackage $trainerPackage)
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'interval'    => 'required|in:monthly,yearly',
-            'duration_days'=> 'required|integer|min:1',
-            'features'    => 'nullable|array',
-            'is_active'   => 'required|boolean',
-        ]);
+        $data = $this->validatedData($request);
         $trainerPackage->update($data);
+
         return redirect()->route('trainer-packages.index')
-                         ->withSuccess(__('Package updated successfully'));
+                         ->withSuccess('Trainer package updated successfully');
     }
 
-    public function destroy(\App\Models\TrainerPackage $trainerPackage)
+    public function destroy(TrainerPackage $trainerPackage)
     {
         $trainerPackage->delete();
+
         return redirect()->route('trainer-packages.index')
-                         ->withSuccess(__('Package deleted successfully'));
+                         ->withSuccess('Trainer package deleted successfully');
+    }
+
+    protected function validatedData(Request $request): array
+    {
+        $data = $request->validate([
+            'name'          => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'price'         => 'required|numeric|min:0',
+            'interval'      => 'required|in:monthly,yearly',
+            'duration_days' => 'required|integer|min:1',
+            'features'      => 'nullable|string',
+            'is_active'     => 'required|boolean',
+        ]);
+
+        $data['features'] = collect(preg_split('/\r\n|\r|\n/', (string) ($data['features'] ?? '')))
+            ->map(fn ($feature) => trim($feature))
+            ->filter()
+            ->values()
+            ->all();
+
+        return $data;
     }
 }

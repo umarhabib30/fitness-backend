@@ -235,6 +235,7 @@ return [
     'monthly' => 'Monthly',
     'yearly' => 'Yearly',
     'subscription' => 'Subscription',
+    'subscribe' => 'Subscribe',
     'total_amount' => 'Total Amount',
     'payment_type' => 'Payment Type',
     'subscription_start_date' => 'Subscription Start Date',
@@ -655,5 +656,12 @@ return [
     'client_id' => 'Client ID',
     'client_secret' => 'Client Secret',
     'base_url' => 'Base URL',
+
+    // Trainer subscription flow
+    'transaction_reference'  => 'Transaction Reference',
+    'upload_payment_proof'   => 'Upload Payment Proof',
+    'optional'               => 'Optional',
+    'payment_proof'          => 'Payment Proof',
+    'trainer_email'          => 'Trainer Email',
 
 ];

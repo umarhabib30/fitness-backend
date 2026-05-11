@@ -13,6 +13,10 @@
     @endif
 </head>
 <body>
+    @php
+        $trainerUser = auth('trainer')->user();
+        $hasActiveSubscription = $trainerUser && $trainerUser->activeSubscription && $trainerUser->activeSubscription->is_active;
+    @endphp
     <div id="loading">
         @include('partials.dashboard._body_loader')
     </div>
@@ -22,9 +26,11 @@
                 <img src="{{ getSingleMedia(appSettingData('get'),'site_logo',null) }}" class="img-fluid rounded-normal light-logo" alt="logo" style="height: 36px;">
             </a>
             <div class="ms-auto d-flex align-items-center gap-3">
-                <a href="{{ route('trainer.dashboard') }}" class="btn btn-sm btn-soft-primary">{{ __('message.dashboard') }}</a>
-                <a href="{{ route('trainer.packages.index') }}" class="btn btn-sm btn-soft-primary">{{ __('message.package') }}</a>
-                <a href="{{ route('trainer.clients.index') }}" class="btn btn-sm btn-soft-primary">{{ __('message.user') }}</a>
+                @if($hasActiveSubscription)
+                    <a href="{{ route('trainer.dashboard') }}" class="btn btn-sm btn-soft-primary">{{ __('message.dashboard') }}</a>
+                    <a href="{{ route('trainer.clients.index') }}" class="btn btn-sm btn-soft-primary">{{ __('message.user') }}</a>
+                @endif
+                <a href="{{ route('trainer.settings.index') }}" class="btn btn-sm btn-soft-primary">{{ __('message.setting') }}</a>
                 <span class="text-muted small">{{ auth('trainer')->user()->name ?? '' }}</span>
                 <form method="POST" action="{{ route('trainer.logout') }}">
                     @csrf

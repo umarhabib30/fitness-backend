@@ -29,7 +29,7 @@ class TrainerActive
             return $next($request);
         }
 
-        return redirect()->route('trainer.packages.index')
+        return redirect()->route('trainer.settings.index')
             ->withErrors(['subscription' => __('message.trainer_subscription_inactive')]);
     }
 }
