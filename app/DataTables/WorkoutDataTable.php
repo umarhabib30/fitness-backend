@@ -100,7 +100,7 @@ class WorkoutDataTable extends DataTable
      */
     public function query(Workout $model)
     {
-        return TrainerHelper::applyScope($model->newQuery());
+        return TrainerHelper::applyTrainerOrGlobalScope($model->newQuery());
     }
 
 

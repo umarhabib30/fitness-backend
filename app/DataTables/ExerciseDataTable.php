@@ -93,7 +93,7 @@ class ExerciseDataTable extends DataTable
     public function query(Exercise $model)
     {
         $model = Exercise::query()->with('equipment','level');
-        TrainerHelper::applyScope($model);
+        TrainerHelper::applyTrainerOrGlobalScope($model);
         return $this->applyScopes($model);
     }
 

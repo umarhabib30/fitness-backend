@@ -7,6 +7,7 @@ class TrainerPermissions
     public const PERMISSIONS = [
         'equipment-list', 'equipment-add', 'equipment-edit', 'equipment-delete',
         'exercise-list', 'exercise-add', 'exercise-edit', 'exercise-delete',
+        'level-list',
         'workout-list', 'workout-add', 'workout-edit', 'workout-delete',
         'diet-list', 'diet-add', 'diet-edit', 'diet-delete',
         'bodyparts-list', 'bodyparts-add', 'bodyparts-edit', 'bodyparts-delete',

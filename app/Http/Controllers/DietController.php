@@ -95,6 +95,7 @@ class DietController extends Controller
         }
 
         $data = Diet::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
         $pageTitle = __('message.update_form_title',[ 'form' => __('message.diet') ]);
 
         return view('diet.form', compact('data','id','pageTitle'));

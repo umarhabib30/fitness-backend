@@ -94,6 +94,7 @@ class BodyPartController extends Controller
         }
 
         $data = BodyPart::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
         $pageTitle = __('message.update_form_title',[ 'form' => __('message.bodypart') ]);
 
         return view('bodypart.form', compact('data','id','pageTitle'));
