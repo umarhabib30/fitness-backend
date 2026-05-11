@@ -95,6 +95,7 @@ class EquipmentController extends Controller
         }
 
         $data = Equipment::findOrFail($id);
+        TrainerHelper::abortIfUnauthorized($data);
         $pageTitle = __('message.update_form_title',[ 'form' => __('message.equipment') ]);
 
         return view('equipment.form', compact('data','id','pageTitle'));

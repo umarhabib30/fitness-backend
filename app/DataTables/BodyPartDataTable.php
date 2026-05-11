@@ -72,7 +72,7 @@ class BodyPartDataTable extends DataTable
      */
     public function query(BodyPart $model)
     {
-        return TrainerHelper::applyScope($model->newQuery());
+        return TrainerHelper::applyTrainerOrGlobalScope($model->newQuery());
     }
 
 

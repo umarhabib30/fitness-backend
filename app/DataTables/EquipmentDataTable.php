@@ -73,7 +73,7 @@ class EquipmentDataTable extends DataTable
      */
     public function query(Equipment $model)
     {
-        return TrainerHelper::applyScope($model->newQuery());
+        return TrainerHelper::applyTrainerOrGlobalScope($model->newQuery());
     }
 
     /**

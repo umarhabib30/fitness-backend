@@ -48,6 +48,31 @@ class TrainerHelper
         return $query;
     }
 
+    public static function applyTrainerOrGlobalScope(Builder $query, string $column = 'trainer_id'): Builder
+    {
+        if (!self::isTrainer()) {
+            return self::applyScope($query, $column);
+        }
+
+        $table = $query->getModel()->getTable();
+
+        if (!Schema::hasTable($table) || !Schema::hasColumn($table, $column)) {
+            return $query;
+        }
+
+        $trainerId = self::trainerId();
+
+        $query->where(function ($query) use ($column, $trainerId) {
+            $query->whereNull($column);
+
+            if ($trainerId) {
+                $query->orWhere($column, $trainerId);
+            }
+        });
+
+        return $query;
+    }
+
     public static function setTrainerId(array $data, string $column = 'trainer_id'): array
     {
         if (!self::isTrainer() || !self::trainerId()) {

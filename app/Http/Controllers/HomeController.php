@@ -95,19 +95,19 @@ class HomeController extends Controller
 
         $data['dashboard'] = [
             'total_user'        => TrainerHelper::applyScope(User::role('user'))->count(),
-            'total_equipment'   => TrainerHelper::applyScope(Equipment::query())->count(),
+            'total_equipment'   => TrainerHelper::applyTrainerOrGlobalScope(Equipment::query())->count(),
             'total_level'       => Level::count(),
-            'total_bodypart'    => TrainerHelper::applyScope(BodyPart::query())->count(),
+            'total_bodypart'    => TrainerHelper::applyTrainerOrGlobalScope(BodyPart::query())->count(),
             'total_workouttype' => WorkoutType::count(),
-            'total_exercise'    => TrainerHelper::applyScope(Exercise::query())->count(),
-            'total_workout'     => TrainerHelper::applyScope(Workout::query())->count(),
-            'total_diet'        => TrainerHelper::applyScope(Diet::query())->count(),
+            'total_exercise'    => TrainerHelper::applyTrainerOrGlobalScope(Exercise::query())->count(),
+            'total_workout'     => TrainerHelper::applyTrainerOrGlobalScope(Workout::query())->count(),
+            'total_diet'        => TrainerHelper::applyTrainerOrGlobalScope(Diet::query())->count(),
             'total_post'        => Post::count(),
         ];               
 
-        $data['exercise'] = TrainerHelper::applyScope(Exercise::query())->orderBy('id', 'desc')->take(10)->get();
-        $data['workout'] = TrainerHelper::applyScope(Workout::query())->orderBy('id', 'desc')->take(10)->get();
-        $data['diet'] = TrainerHelper::applyScope(Diet::query())->orderBy('id', 'desc')->take(10)->get();
+        $data['exercise'] = TrainerHelper::applyTrainerOrGlobalScope(Exercise::query())->orderBy('id', 'desc')->take(10)->get();
+        $data['workout'] = TrainerHelper::applyTrainerOrGlobalScope(Workout::query())->orderBy('id', 'desc')->take(10)->get();
+        $data['diet'] = TrainerHelper::applyTrainerOrGlobalScope(Diet::query())->orderBy('id', 'desc')->take(10)->get();
         $data['post'] = Post::orderBy('id', 'desc')->take(10)->get();
 
         return view('dashboards.dashboard', compact('assets', 'data', 'auth_user'));
@@ -416,7 +416,7 @@ class HomeController extends Controller
                 break;
         case 'equipment':
             $items = Equipment::select('id','title as text')->where('status','active');
-                TrainerHelper::applyScope($items);
+                TrainerHelper::applyTrainerOrGlobalScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -439,7 +439,7 @@ class HomeController extends Controller
                 break;
         case 'bodypart':
             $items = BodyPart::select('id','title as text')->where('status','active');
-                TrainerHelper::applyScope($items);
+                TrainerHelper::applyTrainerOrGlobalScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -447,7 +447,7 @@ class HomeController extends Controller
                 break;
         case 'exercise':
             $items = Exercise::select('id','title as text')->where('status','active');
-                TrainerHelper::applyScope($items);
+                TrainerHelper::applyTrainerOrGlobalScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -469,7 +469,7 @@ class HomeController extends Controller
                 break;
         case 'diet':
             $items = Diet::select('id','title as text')->where('status','active');
-                TrainerHelper::applyScope($items);
+                TrainerHelper::applyTrainerOrGlobalScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }
@@ -500,7 +500,7 @@ class HomeController extends Controller
                 break;
         case 'workout':
                 $items = Workout::select('id','title as text');
-                TrainerHelper::applyScope($items);
+                TrainerHelper::applyTrainerOrGlobalScope($items);
                 if($value != ''){
                     $items->where('title', 'LIKE', '%'.$value.'%');
                 }

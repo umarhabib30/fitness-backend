@@ -91,7 +91,7 @@ class DietDataTable extends DataTable
     public function query(Diet $model)
     {
         $model = Diet::query()->with('categorydiet');
-        TrainerHelper::applyScope($model);
+        TrainerHelper::applyTrainerOrGlobalScope($model);
         return $this->applyScopes($model);
     }
 

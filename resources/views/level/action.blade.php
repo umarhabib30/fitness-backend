@@ -1,9 +1,10 @@
 <?php
     $auth_user = auth()->user();
+    $canManageLevel = ! \App\Helpers\TrainerHelper::isTrainer();
 ?>
 
 <div class="d-flex align-items-center">
-    @if($auth_user->can('level-edit'))
+    @if($auth_user->can('level-edit') && $canManageLevel)
     <a class="btn btn-sm btn-icon btn-success me-2" href="{{ route('level.edit', $id) }}" data-bs-toggle="tooltip" title="{{ __('message.update_form_title',['form' => __('message.level') ]) }}">
             <span class="btn-inner">
                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,7 +15,7 @@
             </span>
         </a>
     @endif
-    @if($auth_user->can('level-delete'))
+    @if($auth_user->can('level-delete') && $canManageLevel)
         {{ html()->form('POST', route('level.destroy', $id))->attribute('data--submit', 'level-delete'.$id)->open() }} 
         {{ html()->hidden('_method', 'DELETE') }}
             <a class="btn btn-sm btn-icon btn-danger" href="javascript:void(0)" data-bs-toggle="tooltip" data--submit="level-delete{{$id}}" 
@@ -30,5 +31,9 @@
                 </span>
             </a>
         {{ html()->form()->close() }}
+    @endif
+
+    @if(! $canManageLevel)
+        <span class="text-muted small">Read only</span>
     @endif
 </div>
